@@ -6,7 +6,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Bind SandboxCredentials from appsettings.Development.json
+// Bind SandboxCredentials from configuration
 builder.Services.Configure<SandboxCredentials>(
     builder.Configuration.GetSection(SandboxCredentials.Section));
 
@@ -51,7 +51,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = sandboxCreds.Bearer.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(sandboxCreds.Bearer.JwtKey))
     };
-    // Return 401 with JSON body (not a redirect) when JWT validation fails
+
     options.Events = new JwtBearerEvents
     {
         OnChallenge = async ctx =>
@@ -60,13 +60,18 @@ builder.Services.AddAuthentication(options =>
             var reason = ctx.AuthenticateFailure?.Message ?? "Missing or invalid Bearer token.";
             ctx.Response.ContentType = "application/json";
             ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
             var body = System.Text.Json.JsonSerializer.Serialize(new
             {
                 status = 401,
                 error = "Unauthorized",
                 scheme = "Bearer",
                 reason
-            }, new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase });
+            }, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+            });
+
             await ctx.Response.WriteAsync(body);
         }
     };
@@ -84,7 +89,6 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1-oauth2", new OpenApiInfo { Title = "OAuth 2.0", Version = "v1" });
     c.SwaggerDoc("v1-oidc", new OpenApiInfo { Title = "OpenID Connect", Version = "v1" });
 
-    // 1. Basic Auth
     c.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -94,10 +98,9 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" } }, new string[] {} }
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" } }, Array.Empty<string>() }
     });
 
-    // 2. Bearer Auth
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -109,10 +112,9 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] {} }
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() }
     });
 
-    // 3. API Key (Header)
     c.AddSecurityDefinition("ApiKeyHeader", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,
@@ -122,10 +124,9 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyHeader" } }, new string[] {} }
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyHeader" } }, Array.Empty<string>() }
     });
 
-    // 4. API Key (Query)
     c.AddSecurityDefinition("ApiKeyQuery", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,
@@ -135,10 +136,9 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyQuery" } }, new string[] {} }
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyQuery" } }, Array.Empty<string>() }
     });
 
-    // 5. API Key (Cookie)
     c.AddSecurityDefinition("ApiKeyCookie", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.ApiKey,
@@ -148,10 +148,9 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyCookie" } }, new string[] {} }
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyCookie" } }, Array.Empty<string>() }
     });
 
-    // 6. OAuth 2.0 – Client Credentials (shows client_id + client_secret in Swagger UI)
     c.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.OAuth2,
@@ -170,7 +169,6 @@ builder.Services.AddSwaggerGen(c =>
         { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "OAuth2" } }, new[] { "read_data" } }
     });
 
-    // 7. OpenID Connect
     c.AddSecurityDefinition("OpenIDConnect", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.OpenIdConnect,
@@ -179,27 +177,25 @@ builder.Services.AddSwaggerGen(c =>
     });
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "OpenIDConnect" } }, new string[] {} }
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "OpenIDConnect" } }, Array.Empty<string>() }
     });
 });
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Enable Swagger in all environments for sandbox usage
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1-basic/swagger.json", "Basic Auth");
-        c.SwaggerEndpoint("/swagger/v1-bearer/swagger.json", "Bearer Auth (JWT)");
-        c.SwaggerEndpoint("/swagger/v1-apikey-header/swagger.json", "API Key (Header)");
-        c.SwaggerEndpoint("/swagger/v1-apikey-query/swagger.json", "API Key (Query)");
-        c.SwaggerEndpoint("/swagger/v1-apikey-cookie/swagger.json", "API Key (Cookie)");
-        c.SwaggerEndpoint("/swagger/v1-oauth2/swagger.json", "OAuth 2.0");
-        c.SwaggerEndpoint("/swagger/v1-oidc/swagger.json", "OpenID Connect");
-        c.InjectJavascript("/swagger-custom.js");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1-basic/swagger.json", "Basic Auth");
+    c.SwaggerEndpoint("/swagger/v1-bearer/swagger.json", "Bearer Auth (JWT)");
+    c.SwaggerEndpoint("/swagger/v1-apikey-header/swagger.json", "API Key (Header)");
+    c.SwaggerEndpoint("/swagger/v1-apikey-query/swagger.json", "API Key (Query)");
+    c.SwaggerEndpoint("/swagger/v1-apikey-cookie/swagger.json", "API Key (Cookie)");
+    c.SwaggerEndpoint("/swagger/v1-oauth2/swagger.json", "OAuth 2.0");
+    c.SwaggerEndpoint("/swagger/v1-oidc/swagger.json", "OpenID Connect");
+    c.InjectJavascript("/swagger-custom.js");
+});
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();
