@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace AuthSandbox.Infrastructure;
 
+
 public enum ApiKeyLocation { Header, Query, Cookie }
 
 public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions
