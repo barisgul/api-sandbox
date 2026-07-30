@@ -88,6 +88,10 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1-apikey-cookie", new OpenApiInfo { Title = "API Key (Cookie)", Version = "v1" });
     c.SwaggerDoc("v1-oauth2", new OpenApiInfo { Title = "OAuth 2.0", Version = "v1" });
     c.SwaggerDoc("v1-oidc", new OpenApiInfo { Title = "OpenID Connect", Version = "v1" });
+    c.SwaggerDoc("v1-banking", new OpenApiInfo { Title = "Banking & Account Maturity Pipeline", Version = "v1" });
+    c.SwaggerDoc("v1-travel", new OpenApiInfo { Title = "Travel & Flight Booking Pipeline", Version = "v1" });
+    c.SwaggerDoc("v1-ecommerce", new OpenApiInfo { Title = "E-Commerce Checkout & Logistics Pipeline", Version = "v1" });
+    c.SwaggerDoc("v1-healthcare", new OpenApiInfo { Title = "Healthcare & Patient Care Pipeline", Version = "v1" });
 
     c.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
     {
@@ -194,6 +198,10 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1-apikey-cookie/swagger.json", "API Key (Cookie)");
     c.SwaggerEndpoint("/swagger/v1-oauth2/swagger.json", "OAuth 2.0");
     c.SwaggerEndpoint("/swagger/v1-oidc/swagger.json", "OpenID Connect");
+    c.SwaggerEndpoint("/swagger/v1-banking/swagger.json", "Banking & Account Maturity");
+    c.SwaggerEndpoint("/swagger/v1-travel/swagger.json", "Travel & Flight Booking");
+    c.SwaggerEndpoint("/swagger/v1-ecommerce/swagger.json", "E-Commerce Checkout & Logistics");
+    c.SwaggerEndpoint("/swagger/v1-healthcare/swagger.json", "Healthcare & Patient Care");
     c.InjectJavascript("/swagger-custom.js");
 });
 

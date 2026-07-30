@@ -18,6 +18,40 @@ A .NET 9 sandbox API for exploring and testing different HTTP authentication sch
 
 ---
 
+## 🔗 Multi-Step Chained Domain Sandboxes
+
+In addition to authentication testing, the sandbox provides 4 domain-specific 5-step API pipelines for practicing request chaining and data maturity:
+
+### 1. 🏦 Retail Banking & Account Maturity (`/api/sandbox/banking`)
+- `POST /api/sandbox/banking/customers` → Create customer profile
+- `POST /api/sandbox/banking/customers/{id}/kyc` → Submit KYC identity check
+- `POST /api/sandbox/banking/accounts/checking` → Open checking account
+- `POST /api/sandbox/banking/accounts/savings` → Attach savings sub-account
+- `POST /api/sandbox/banking/accounts/deposit` → Fund initial balance (matures account)
+
+### 2. ✈️ Travel, Airline & Hotel Booking (`/api/sandbox/travel`)
+- `POST /api/sandbox/travel/passengers` → Register passenger profile
+- `POST /api/sandbox/travel/flights/hold-seats` → Hold flight seat
+- `POST /api/sandbox/travel/bookings/flight` → Book flight & generate PNR
+- `POST /api/sandbox/travel/bookings/hotel` → Reserve hotel room linked to PNR
+- `POST /api/sandbox/travel/itineraries/confirm` → Issue e-ticket & QR boarding pass
+
+### 3. 🛍️ E-Commerce Checkout & Logistics (`/api/sandbox/ecommerce`)
+- `POST /api/sandbox/ecommerce/cart` → Initialize shopping cart
+- `POST /api/sandbox/ecommerce/cart/items` → Add items & reserve stock
+- `POST /api/sandbox/ecommerce/orders` → Create checkout order
+- `POST /api/sandbox/ecommerce/orders/payments` → Process payment transaction
+- `POST /api/sandbox/ecommerce/shipments/dispatch` → Dispatch parcel & tracking number
+
+### 4. 🏥 Healthcare & Patient Care (`/api/sandbox/healthcare`)
+- `POST /api/sandbox/healthcare/patients` → Register patient & insurance
+- `POST /api/sandbox/healthcare/appointments/hold-slot` → Hold doctor consultation slot
+- `POST /api/sandbox/healthcare/appointments` → Confirm telehealth appointment
+- `POST /api/sandbox/healthcare/consultations/notes` → Submit diagnosis & e-prescription
+- `POST /api/sandbox/healthcare/pharmacy/dispense` → Dispense medication & pickup code
+
+---
+
 ## Getting Started
 
 ### Prerequisites
