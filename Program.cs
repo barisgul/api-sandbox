@@ -81,17 +81,61 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1-basic", new OpenApiInfo { Title = "Basic Auth", Version = "v1" });
-    c.SwaggerDoc("v1-bearer", new OpenApiInfo { Title = "Bearer Auth (JWT)", Version = "v1" });
-    c.SwaggerDoc("v1-apikey-header", new OpenApiInfo { Title = "API Key (Header)", Version = "v1" });
-    c.SwaggerDoc("v1-apikey-query", new OpenApiInfo { Title = "API Key (Query)", Version = "v1" });
-    c.SwaggerDoc("v1-apikey-cookie", new OpenApiInfo { Title = "API Key (Cookie)", Version = "v1" });
-    c.SwaggerDoc("v1-oauth2", new OpenApiInfo { Title = "OAuth 2.0", Version = "v1" });
-    c.SwaggerDoc("v1-oidc", new OpenApiInfo { Title = "OpenID Connect", Version = "v1" });
-    c.SwaggerDoc("v1-banking", new OpenApiInfo { Title = "Banking & Account Maturity Pipeline", Version = "v1" });
-    c.SwaggerDoc("v1-travel", new OpenApiInfo { Title = "Travel & Flight Booking Pipeline", Version = "v1" });
-    c.SwaggerDoc("v1-ecommerce", new OpenApiInfo { Title = "E-Commerce Checkout & Logistics Pipeline", Version = "v1" });
-    c.SwaggerDoc("v1-healthcare", new OpenApiInfo { Title = "Healthcare & Patient Care Pipeline", Version = "v1" });
+    c.SwaggerDoc("v1-basic", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — Basic Auth", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test HTTP Basic authentication credentials (`sandbox-user` / `sandbox-pass`), header forwarding, and automated error handling in Quixa workflows." 
+    });
+    c.SwaggerDoc("v1-bearer", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — Bearer Auth (JWT)", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test Bearer JWT authentication, token generation (`POST /api/BearerAuth/token`), and authorization headers." 
+    });
+    c.SwaggerDoc("v1-apikey-header", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — API Key (Header)", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test `X-Api-Key` request header authentication (`sandbox-api-key-header-123`)." 
+    });
+    c.SwaggerDoc("v1-apikey-query", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — API Key (Query)", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test `?api_key=` URL query parameter authentication (`sandbox-api-key-query-123`)." 
+    });
+    c.SwaggerDoc("v1-apikey-cookie", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — API Key (Cookie)", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test `AuthCookie` cookie-based authentication (`sandbox-api-key-cookie-123`)." 
+    });
+    c.SwaggerDoc("v1-oauth2", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — OAuth 2.0", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test OAuth 2.0 Client Credentials flows, client_id / client_secret exchange, and scope verification." 
+    });
+    c.SwaggerDoc("v1-oidc", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — OpenID Connect", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test OpenID Connect discovery endpoints and identity token verification." 
+    });
+    c.SwaggerDoc("v1-banking", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — Banking & Account Maturity Pipeline", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating customer KYC verification, account creation, savings sub-account attachment, and account funding workflows." 
+    });
+    c.SwaggerDoc("v1-travel", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — Travel & Flight Booking Pipeline", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating passenger registration, seat hold reservations, PNR generation, hotel booking, and e-ticket issuance." 
+    });
+    c.SwaggerDoc("v1-ecommerce", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — E-Commerce Checkout & Logistics Pipeline", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating shopping cart initialization, inventory reservation, order placement, payment processing, and parcel dispatch." 
+    });
+    c.SwaggerDoc("v1-healthcare", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — Healthcare & Patient Care Pipeline", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating patient intake, telehealth appointment holding, consultation notes, e-prescriptions, and pharmacy fulfillment." 
+    });
 
     c.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
     {
