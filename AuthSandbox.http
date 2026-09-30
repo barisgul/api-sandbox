@@ -1,6 +1,50 @@
 @AuthSandbox_HostAddress = http://localhost:5255
 
-GET {{AuthSandbox_HostAddress}}/weatherforecast/
+### 1. Health
+GET {{AuthSandbox_HostAddress}}/api/sandbox/health
 Accept: application/json
+
+###
+
+### 2. Basic Auth - Secure Data
+GET {{AuthSandbox_HostAddress}}/api/BasicAuth/secure-data
+Authorization: Basic c2FuZGJveC11c2VyOnNhbmRib3gtcGFzcw==
+Accept: application/json
+
+###
+
+### 3. Basic Auth - Test 2
+GET {{AuthSandbox_HostAddress}}/api/BasicAuth/test-2
+Authorization: Basic c2FuZGJveC11c2VyOnNhbmRib3gtcGFzcw==
+Accept: application/json
+
+###
+
+### 4. Healthcare - Register Patient (without optional email)
+POST {{AuthSandbox_HostAddress}}/api/sandbox/healthcare/patients
+Content-Type: application/json
+Accept: application/json
+
+{
+  "fullName": "Alex Smith",
+  "dateOfBirth": "1988-11-23",
+  "insuranceProvider": "BlueShield",
+  "policyNumber": "POL-99201"
+}
+
+###
+
+### 5. Healthcare - Register Patient (with email provided or null)
+POST {{AuthSandbox_HostAddress}}/api/sandbox/healthcare/patients
+Content-Type: application/json
+Accept: application/json
+
+{
+  "fullName": "Alex Smith",
+  "dateOfBirth": "1988-11-23",
+  "insuranceProvider": "BlueShield",
+  "policyNumber": "POL-99201",
+  "email": "alex.smith@example.com"
+}
 
 ###

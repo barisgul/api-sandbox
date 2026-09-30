@@ -50,6 +50,9 @@ In addition to authentication testing, the sandbox provides 4 domain-specific 5-
 - `POST /api/sandbox/healthcare/consultations/notes` → Submit diagnosis & e-prescription
 - `POST /api/sandbox/healthcare/pharmacy/dispense` → Dispense medication & pickup code
 
+### 5. 🩺 Health (`/api/sandbox/health`)
+- `GET /api/sandbox/health` → Service health check returning status, service name, version, and UTC timestamp
+
 ---
 
 ## Getting Started
@@ -134,6 +137,11 @@ Controllers/
   OAuth2AuthController.cs         # Protected endpoint (OAuth2)
   OAuth2TokenController.cs        # Token endpoint (client_credentials)
   OidcAuthController.cs           # Protected endpoint (OIDC/JWT)
+  BankingSandboxController.cs     # 5-step banking pipeline
+  TravelSandboxController.cs      # 5-step flight & hotel booking pipeline
+  ECommerceSandboxController.cs   # 5-step e-commerce & shipping pipeline
+  HealthcareSandboxController.cs  # 5-step telehealth & prescription pipeline
+  HealthSandboxController.cs      # Health check test endpoint (GET, no params)
   ValidationController.cs         # Internal: Swagger UI pre-authorize validation
 
 Infrastructure/

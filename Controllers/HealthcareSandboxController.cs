@@ -11,7 +11,7 @@ namespace AuthSandbox.Controllers
     {
         private static readonly ConcurrentDictionary<string, object> DataStore = new();
 
-        public record RegisterPatientRequest(string FullName, string DateOfBirth, string InsuranceProvider = "BlueShield", string PolicyNumber = "POL-99201");
+        public record RegisterPatientRequest(string FullName, string DateOfBirth, string InsuranceProvider = "BlueShield", string PolicyNumber = "POL-99201", string? Email = null);
         public record HoldSlotRequest(string DoctorId = "DOC-882", string PreferredDate = "2026-07-31", string TimeSlot = "10:00 AM");
         public record ScheduleAppointmentRequest(string PatientId, string SlotHoldId, string Reason = "Annual Telehealth Consultation");
         public record SubmitConsultationNotesRequest(string AppointmentId, string Diagnosis = "Acute Upper Respiratory Infection", string Medication = "Amoxicillin 500mg", int DosageDays = 7);
@@ -31,6 +31,7 @@ namespace AuthSandbox.Controllers
                 dateOfBirth = request.DateOfBirth ?? "1988-11-23",
                 insuranceProvider = request.InsuranceProvider ?? "BlueShield",
                 policyNumber = request.PolicyNumber ?? "POL-99201",
+                email = request.Email,
                 patientStatus = "REGISTERED",
                 registeredAt = DateTime.UtcNow
             };

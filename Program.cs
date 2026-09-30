@@ -136,6 +136,11 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1", 
         Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating patient intake, telehealth appointment holding, consultation notes, e-prescriptions, and pharmacy fulfillment." 
     });
+    c.SwaggerDoc("v1-health", new OpenApiInfo { 
+        Title = "Quixa Test API Sandbox — Health", 
+        Version = "v1", 
+        Description = "🧪 **Quixa Test API Sandbox** — Health check endpoint returning operational status, service metadata, and UTC timestamp." 
+    });
 
     c.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
     {
@@ -246,6 +251,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1-travel/swagger.json", "Travel & Flight Booking");
     c.SwaggerEndpoint("/swagger/v1-ecommerce/swagger.json", "E-Commerce Checkout & Logistics");
     c.SwaggerEndpoint("/swagger/v1-healthcare/swagger.json", "Healthcare & Patient Care");
+    c.SwaggerEndpoint("/swagger/v1-health/swagger.json", "Health");
     c.InjectJavascript("/swagger-custom.js");
 });
 
@@ -254,4 +260,21 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapGet("/health", () => Results.Ok(new
+{
+    status = "Healthy",
+    service = "Quixa Test API Sandbox",
+    version = "1.0.0",
+    timestamp = DateTime.UtcNow
+})).ExcludeFromDescription();
+
+app.MapGet("/api/health", () => Results.Ok(new
+{
+    status = "Healthy",
+    service = "Quixa Test API Sandbox",
+    version = "1.0.0",
+    timestamp = DateTime.UtcNow
+})).ExcludeFromDescription();
+
 app.Run();
