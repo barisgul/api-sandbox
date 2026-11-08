@@ -5,6 +5,10 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSandbox", "AuthSandbox.csproj", "{D805C3C3-D062-4872-BE90-F16BFF86C474}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSandbox.Tests", "tests\AuthSandbox.Tests\AuthSandbox.Tests.csproj", "{80771E73-3DD7-4AAF-9435-382BA191CC13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +31,23 @@ Global
 		{D805C3C3-D062-4872-BE90-F16BFF86C474}.Release|x64.Build.0 = Release|Any CPU
 		{D805C3C3-D062-4872-BE90-F16BFF86C474}.Release|x86.ActiveCfg = Release|Any CPU
 		{D805C3C3-D062-4872-BE90-F16BFF86C474}.Release|x86.Build.0 = Release|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Debug|x64.Build.0 = Debug|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Debug|x86.Build.0 = Debug|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Release|x64.ActiveCfg = Release|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Release|x64.Build.0 = Release|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Release|x86.ActiveCfg = Release|Any CPU
+		{80771E73-3DD7-4AAF-9435-382BA191CC13}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{80771E73-3DD7-4AAF-9435-382BA191CC13} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

@@ -16,6 +16,7 @@ namespace AuthSandbox.Controllers;
 [ApiController]
 [Route("oauth")]
 [ApiExplorerSettings(GroupName = "v1-oauth2")]
+[Tags("Auth — OAuth2 token")]
 public class OAuth2TokenController : ControllerBase
 {
     private readonly SandboxCredentials _credentials;

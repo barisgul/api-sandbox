@@ -1,8 +1,15 @@
+using System.Globalization;
 using System.Text;
 using AuthSandbox.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using AuthSandbox.Infrastructure.Demo;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
+// Parse decimals and dates the same way on every host (form fields such as "1850.00").
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +22,17 @@ var sandboxCreds = builder.Configuration
     .Get<SandboxCredentials>() ?? new SandboxCredentials();
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.Configure<DemoAuthOptions>(builder.Configuration.GetSection(DemoAuthOptions.Section));
+builder.Services.AddControllers(o => o.Filters.Add<DemoAuthFilter>())
+    .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddProblemDetails();
+builder.Services.TryAddSingleton(TimeProvider.System);
+
+// One in-memory state singleton per demo domain (BankingState, TravelState, ...)
+foreach (var stateType in typeof(SandboxState).Assembly.GetTypes()
+             .Where(t => t is { IsAbstract: false, IsClass: true } && t.IsSubclassOf(typeof(SandboxState))))
+    builder.Services.AddSingleton(stateType);
+
 
 // Configure Authentication
 builder.Services.AddAuthentication(options =>
@@ -77,183 +94,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1-basic", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — Basic Auth", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test HTTP Basic authentication credentials (`sandbox-user` / `sandbox-pass`), header forwarding, and automated error handling in Quixa workflows." 
-    });
-    c.SwaggerDoc("v1-bearer", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — Bearer Auth (JWT)", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test Bearer JWT authentication, token generation (`POST /api/BearerAuth/token`), and authorization headers." 
-    });
-    c.SwaggerDoc("v1-apikey-header", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — API Key (Header)", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test `X-Api-Key` request header authentication (`sandbox-api-key-header-123`)." 
-    });
-    c.SwaggerDoc("v1-apikey-query", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — API Key (Query)", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test `?api_key=` URL query parameter authentication (`sandbox-api-key-query-123`)." 
-    });
-    c.SwaggerDoc("v1-apikey-cookie", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — API Key (Cookie)", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test `AuthCookie` cookie-based authentication (`sandbox-api-key-cookie-123`)." 
-    });
-    c.SwaggerDoc("v1-oauth2", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — OAuth 2.0", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test OAuth 2.0 Client Credentials flows, client_id / client_secret exchange, and scope verification." 
-    });
-    c.SwaggerDoc("v1-oidc", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — OpenID Connect", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Purpose-built mock target server developed to test OpenID Connect discovery endpoints and identity token verification." 
-    });
-    c.SwaggerDoc("v1-banking", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — Banking & Account Maturity Pipeline", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating customer KYC verification, account creation, savings sub-account attachment, and account funding workflows." 
-    });
-    c.SwaggerDoc("v1-travel", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — Travel & Flight Booking Pipeline", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating passenger registration, seat hold reservations, PNR generation, hotel booking, and e-ticket issuance." 
-    });
-    c.SwaggerDoc("v1-ecommerce", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — E-Commerce Checkout & Logistics Pipeline", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating shopping cart initialization, inventory reservation, order placement, payment processing, and parcel dispatch." 
-    });
-    c.SwaggerDoc("v1-healthcare", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — Healthcare & Patient Care Pipeline", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Multi-step chainable REST API pipeline simulating patient intake, telehealth appointment holding, consultation notes, e-prescriptions, and pharmacy fulfillment." 
-    });
-    c.SwaggerDoc("v1-health", new OpenApiInfo { 
-        Title = "Quixa Test API Sandbox — Health", 
-        Version = "v1", 
-        Description = "🧪 **Quixa Test API Sandbox** — Health check endpoint returning operational status, service metadata, and UTC timestamp." 
-    });
-
-    c.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "basic",
-        In = ParameterLocation.Header
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" } }, Array.Empty<string>() }
-    });
-
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Call **POST /api/BearerAuth/token** first to get a JWT, then paste it here."
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() }
-    });
-
-    c.AddSecurityDefinition("ApiKeyHeader", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.ApiKey,
-        Name = "X-Api-Key",
-        In = ParameterLocation.Header,
-        Description = $"Use value: **{sandboxCreds.ApiKeyHeader.Key}**. (Note: 'Authorize' only saves this locally; validation happens on 'Execute'.)"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyHeader" } }, Array.Empty<string>() }
-    });
-
-    c.AddSecurityDefinition("ApiKeyQuery", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.ApiKey,
-        Name = "api_key",
-        In = ParameterLocation.Query,
-        Description = $"Use value: **{sandboxCreds.ApiKeyQuery.Key}** — (Note: 'Authorize' only saves this locally; validation happens on 'Execute'.)"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyQuery" } }, Array.Empty<string>() }
-    });
-
-    c.AddSecurityDefinition("ApiKeyCookie", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.ApiKey,
-        Name = "AuthCookie",
-        In = ParameterLocation.Cookie,
-        Description = $"Use value: **{sandboxCreds.ApiKeyCookie.Key}**. (Note: 'Authorize' only saves this locally; validation happens on 'Execute'.)"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKeyCookie" } }, Array.Empty<string>() }
-    });
-
-    c.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.OAuth2,
-        Flows = new OpenApiOAuthFlows
-        {
-            ClientCredentials = new OpenApiOAuthFlow
-            {
-                TokenUrl = new Uri(sandboxCreds.OAuth2.TokenUrl),
-                Scopes = sandboxCreds.OAuth2.Scopes
-            }
-        },
-        Description = $"Client Credentials Flow. client_id: **{sandboxCreds.OAuth2.ClientId}** / client_secret: **{sandboxCreds.OAuth2.ClientSecret}**"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "OAuth2" } }, new[] { "read_data" } }
-    });
-
-    c.AddSecurityDefinition("OpenIDConnect", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.OpenIdConnect,
-        OpenIdConnectUrl = new Uri(sandboxCreds.OpenIdConnect.DiscoveryUrl),
-        Description = "OpenID Connect Discovery URL (mock — token is validated as JWT Bearer)."
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "OpenIDConnect" } }, Array.Empty<string>() }
-    });
-});
+builder.Services.AddSandboxSwagger(sandboxCreds);
 
 var app = builder.Build();
 
 // Enable Swagger in all environments for sandbox usage
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1-basic/swagger.json", "Basic Auth");
-    c.SwaggerEndpoint("/swagger/v1-bearer/swagger.json", "Bearer Auth (JWT)");
-    c.SwaggerEndpoint("/swagger/v1-apikey-header/swagger.json", "API Key (Header)");
-    c.SwaggerEndpoint("/swagger/v1-apikey-query/swagger.json", "API Key (Query)");
-    c.SwaggerEndpoint("/swagger/v1-apikey-cookie/swagger.json", "API Key (Cookie)");
-    c.SwaggerEndpoint("/swagger/v1-oauth2/swagger.json", "OAuth 2.0");
-    c.SwaggerEndpoint("/swagger/v1-oidc/swagger.json", "OpenID Connect");
-    c.SwaggerEndpoint("/swagger/v1-banking/swagger.json", "Banking & Account Maturity");
-    c.SwaggerEndpoint("/swagger/v1-travel/swagger.json", "Travel & Flight Booking");
-    c.SwaggerEndpoint("/swagger/v1-ecommerce/swagger.json", "E-Commerce Checkout & Logistics");
-    c.SwaggerEndpoint("/swagger/v1-healthcare/swagger.json", "Healthcare & Patient Care");
-    c.SwaggerEndpoint("/swagger/v1-health/swagger.json", "Health");
-    c.InjectJavascript("/swagger-custom.js");
-});
+app.UseSandboxSwaggerUi();
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();
@@ -278,3 +124,5 @@ app.MapGet("/api/health", () => Results.Ok(new
 })).ExcludeFromDescription();
 
 app.Run();
+
+public partial class Program;
