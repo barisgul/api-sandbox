@@ -114,13 +114,13 @@ Four chainable, stateful demo APIs built for Quixa flows, demo pages and product
 
 ### Optional authentication for the demo APIs
 
-The demo APIs are open by default. Set `DemoAuth:Mode` to protect every domain endpoint. The OpenAPI documents advertise only the active scheme.
+The demo APIs use OAuth2 by default (`DemoAuth:Mode` in `appsettings.json`); set it to `None` or `ApiKey` to change this. The OpenAPI documents advertise only the active scheme.
 
 | Mode | How to call |
 |---|---|
-| `None` (default) | No credentials needed. |
+| `None` | No credentials needed. |
 | `ApiKey` | Send header `X-Api-Key: quixa-demo-key`. Configure with `DemoAuth:ApiKeyHeader` and `DemoAuth:ApiKey`. |
-| `OAuth2` | Call `POST /oauth/token` (form-urlencoded, `grant_type=client_credentials`, `client_id=sandbox-client-id`, `client_secret=sandbox-client-secret`), then send `Authorization: Bearer <access_token>`. Scopes: `read` allows GET; `write` allows POST/PATCH/DELETE and also grants read. Without `scope`, the token gets every scope. A missing scope returns `403 INSUFFICIENT_SCOPE`. |
+| `OAuth2` (default) | Call `POST /oauth/token` (form-urlencoded, `grant_type=client_credentials`, `client_id=sandbox-client-id`, `client_secret=sandbox-client-secret`), then send `Authorization: Bearer <access_token>`. Scopes: `read` allows GET; `write` allows POST/PATCH/DELETE and also grants read. Without `scope`, the token gets every scope. A missing scope returns `403 INSUFFICIENT_SCOPE`. |
 
 The legacy healthcare pipeline (`/api/sandbox/healthcare`) and the health endpoints are unchanged.
 
@@ -231,9 +231,9 @@ tests/AuthSandbox.Tests/           # xUnit + WebApplicationFactory flow tests
 - **State is in memory, per instance.** Keep the app on **one instance**, or enable ARR affinity (session affinity), so a flow's requests reach the same instance. A restart or slot swap resets the data to the seed, which is the same state that `POST …/reset` gives.
 - **Always On:** enable it so the seed is not lost to idle unloads during a recording.
 - **App settings** (Configuration → Application settings; `__` separates sections):
-  - `DemoAuth__Mode` = `None` | `ApiKey` | `OAuth2`
+  - `DemoAuth__Mode` = `None` | `ApiKey` | `OAuth2` (default `OAuth2`, set in `appsettings.json`)
   - `DemoAuth__ApiKey` = your demo key (default `quixa-demo-key`)
-  - `SandboxCredentials__OAuth2__TokenUrl` = `https://<app-host>/oauth/token`. This value appears in the OpenAPI OAuth2 scheme.
+  - `SandboxCredentials__OAuth2__TokenUrl`: already set in `appsettings.json` to the Azure `/oauth/token` URL; override only for another host.
   - Override `SandboxCredentials__Bearer__JwtKey` and the OAuth2 client secret if the host is public.
 - **Quixa import URLs:** one per domain, e.g. `https://<app-host>/swagger/v1-banking/swagger.json`. In `OAuth2` mode each domain document also contains `POST /oauth/token`.
 - The server culture is fixed to invariant, so multipart amounts such as `1850.00` parse the same on every host.

@@ -23,6 +23,7 @@ public sealed class TestApi : IDisposable
     {
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(b =>
         {
+            b.UseSetting("DemoAuth:Mode", "None");   // flow tests run open; auth tests override this
             foreach (var (k, v) in settings) b.UseSetting(k, v);
             b.ConfigureServices(s =>
             {
