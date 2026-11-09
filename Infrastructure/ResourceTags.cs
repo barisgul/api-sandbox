@@ -16,7 +16,7 @@ public static class ResourceTags
     [
         ("banking", "Banking",
         [
-            new("customers", "Customers", "Onboarding with BSN and postal address."),
+            new("customers", "Customers", "Onboarding with personal details and postal address."),
             new("kyc", "KYC / CDD", "Customer due diligence with multipart identity-document upload."),
             new("accounts", "Accounts", "Current, savings, term-deposit and business accounts: open, add balance, withdraw, close."),
             new("transfers", "Transfers", "Money transfers between accounts at this bank."),

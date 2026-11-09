@@ -87,7 +87,8 @@ public class Traveller
 public class Contact
 {
     [Required, EmailAddress] public string Email { get; set; } = "";
-    [Required, E164] public string Phone { get; set; } = "";
+    [Required, E164] public string Phone { get => _phone; set => _phone = Validators.NormalizePhone(value ?? ""); }
+    private string _phone = "";
 }
 
 [SchemaExample("""

@@ -35,21 +35,19 @@ Four chainable, stateful demo APIs built for Quixa flows, demo pages and product
 - **IDs flow step to step.** Every create returns `201` with an `id` (e.g. `cus_1006`, `acc_1007`), so a later Quixa node can bind `{{CreateCustomer.response.id}}`.
 - **Repeatable demos.** `POST /api/sandbox/{domain}/reset` restores a deterministic seed and returns the fixture IDs. Calling it again gives the same result, and IDs restart from the same number.
 - **Errors** are RFC 7807 `application/problem+json` with a stable `code`:
-  - `400`: format or checksum failures, with an `errors` map (BSN 11-proef, IBAN mod-97, EAN check digit, postcode `1234 AB`, E.164).
+  - `400`: format or checksum failures, with an `errors` map (IBAN mod-97, EAN check digit, postcode `1234 AB`, E.164).
   - `404`: unknown resource (`*_NOT_FOUND`).
   - `409`: state conflict (`KYC_ALREADY_APPROVED`, `HOLD_ALREADY_BOOKED`, …).
   - `422`: business-rule failure (`INSUFFICIENT_FUNDS`, `WITHDRAWAL_PERIOD_EXPIRED`, …).
 - **Standards:**
   - ISO 3166-1 alpha-2 countries, ISO 4217 `EUR` amounts.
   - ISO 8601 dates. Times include the local offset, e.g. `2026-12-10T07:15:00+01:00`.
-  - E.164 phone numbers, English API naming.
-  - The BSN is never returned unmasked (GDPR data minimisation).
+  - E.164 phone numbers (spaces allowed, stored without them), English API naming.
 - **Request body types:**
   - JSON for most endpoints.
   - `multipart/form-data` with `format: binary` file fields for KYC (`document`) and claims (`attachment`).
   - `application/x-www-form-urlencoded` for `POST /oauth/token`.
 - **Synthetic fixtures:**
-  - BSNs: `234567892`, `876543219`, `999990019`, `300000005`.
   - IBANs: `NL91ABNA0417164300` (Daan de Boer), `NL33KNAB0417164301` (Sanne Visser), `NL69INGB0123456789` (Jan de Vries).
   - Card tokens: `tok_visa_success`, `tok_mastercard_success`, `tok_card_declined`, `tok_insufficient_funds`.
 
@@ -57,7 +55,7 @@ Four chainable, stateful demo APIs built for Quixa flows, demo pages and product
 
 #### 🏦 Banking — "Open a bank account and pay instantly"
 1. `POST /banking/reset`
-2. `POST /banking/customers`: BSN, postal address. Returns `id`.
+2. `POST /banking/customers`: personal details, postal address. Returns `id`.
 3. `POST /banking/customers/{{2.id}}/kyc`: **multipart**. Fields: `documentType` (PASSPORT / ID_CARD / RESIDENCE_PERMIT), `documentNumber`, `issuingCountry`, `expiryDate`, file `document` (PDF/PNG/JPEG, max 5 MB). Returns `status: APPROVED`.
 4. `POST /banking/accounts` with `{ customerId, product: "CURRENT", bankCode: "KNAB" }`. Returns a valid IBAN and its BIC. Products: `CURRENT`, `SAVINGS` (linked to a current account), `TERM_DEPOSIT` (`termMonths` 3/6/12/24, `openingAmount` ≥ €1,000) and `BUSINESS`.
 5. `POST /banking/accounts/{{4.id}}/deposits` adds balance. Also available:
@@ -73,7 +71,7 @@ Four chainable, stateful demo APIs built for Quixa flows, demo pages and product
    - `GET /banking/psd2/v1/accounts/{{4.id}}/transactions` with header `Consent-ID`.
 - iDEAL-style: `POST /banking/payment-requests`, then `POST /banking/payment-requests/{id}/complete`. The request expires after 15 minutes.
 - Negative tests:
-  - BSN `123456789` → `400`; a duplicate BSN → `409 BSN_ALREADY_REGISTERED`.
+  - Phone `0612345678` (not E.164) → `400`; a duplicate email → `409 EMAIL_ALREADY_REGISTERED`.
   - Last name `Sanction` → KYC `REJECTED`; last name `Pep` → `MANUAL_REVIEW`.
   - A GIF upload → `422 UNSUPPORTED_FILE_FORMAT`; an expired document → `422 DOCUMENT_EXPIRED`.
   - An account before KYC → `422 KYC_NOT_APPROVED`; a large amount → `422 INSUFFICIENT_FUNDS`.
@@ -217,7 +215,7 @@ Controllers/
   HealthcareSandboxController.cs   # legacy 5-step pipeline (unchanged)
 Domain/<Domain>/                   # models, in-memory state + deterministic seed per domain
 Infrastructure/
-  Demo/                            # validators (BSN, IBAN, BIC, EAN, postcode…), problem helpers,
+  Demo/                            # validators (IBAN, BIC, EAN, postcode, E.164…), problem helpers,
                                    # SandboxState base, DemoAuth filter, upload checks
   SwaggerSetup.cs                  # OpenAPI documents, examples, per-document security
 tests/AuthSandbox.Tests/           # xUnit + WebApplicationFactory flow tests

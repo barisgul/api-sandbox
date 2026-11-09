@@ -35,7 +35,7 @@ public static class SwaggerSetup
 
     public static readonly Doc[] DomainDocs =
     [
-        new("v1-banking", "Banking (SEPA / PSD2)", "Quixa Demo — Retail Banking (EU)", Intro + "Customer onboarding with BSN and postal address, KYC/CDD with multipart document upload, IBAN accounts, Verification of Payee, SEPA Credit Transfer & SEPA Instant, iDEAL-style payment requests, Berlin Group NextGenPSD2 account information and camt.053-style statements." + DemoNote, null),
+        new("v1-banking", "Banking (SEPA / PSD2)", "Quixa Demo — Retail Banking (EU)", Intro + "Customer onboarding with personal details and postal address, KYC/CDD with multipart document upload, IBAN accounts, Verification of Payee, SEPA Credit Transfer & SEPA Instant, iDEAL-style payment requests, Berlin Group NextGenPSD2 account information and camt.053-style statements." + DemoNote, null),
         new("v1-insurance", "Insurance", "Quixa Demo — Insurance (EU)", Intro + "Quote → policy (EUR premium incl. 21% insurance premium tax, SEPA direct debit mandate) → claim with multipart attachment → assessment and payout." + DemoNote, null),
         new("v1-travel", "Travel & Booking", "Quixa Demo — Travel & Booking (EU)", Intro + "Hotel and flight search → price-locked hold → booking with guest details → payment (SEPA / card token / iDEAL) → cancellation & refund, EU261 compensation check, per-country accommodation VAT and tourist tax." + DemoNote, null),
         new("v1-ecommerce", "E-Commerce", "Quixa Demo — E-Commerce (EU)", Intro + "GTIN/EAN catalog → cart → checkout with EU VAT (OSS destination rates) → order → PostNL/DHL-style tracking → returns within the 14-day EU withdrawal period." + DemoNote, null),

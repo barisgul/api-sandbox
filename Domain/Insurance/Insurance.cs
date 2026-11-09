@@ -20,7 +20,8 @@ public class Policyholder
     [Required, StringLength(80)] public string LastName { get; set; } = "";
     [Required] public DateOnly? DateOfBirth { get; set; }
     [Required, EmailAddress] public string Email { get; set; } = "";
-    [Required, E164] public string Phone { get; set; } = "";
+    [Required, E164] public string Phone { get => _phone; set => _phone = Validators.NormalizePhone(value ?? ""); }
+    private string _phone = "";
     [Required] public PostalAddress Address { get; set; } = new();
 }
 

@@ -5,14 +5,6 @@ namespace AuthSandbox.Tests;
 public class ValidatorTests
 {
     [Theory]
-    [InlineData("123456782", true)]
-    [InlineData("111222333", true)]
-    [InlineData("123456789", false)]
-    [InlineData("12345678", false)]
-    [InlineData("000000000", false)]
-    public void Bsn_uses_the_11_proef(string bsn, bool valid) => Assert.Equal(valid, Validators.IsValidBsn(bsn));
-
-    [Theory]
     [InlineData("NL91ABNA0417164300", true)]
     [InlineData("NL91 ABNA 0417 1643 00", true)]
     [InlineData("NL92ABNA0417164300", false)]
@@ -50,6 +42,9 @@ public class ValidatorTests
 
     [Theory]
     [InlineData("+31612345678", true)]
+    [InlineData("+31 6 1234 5678", true)]
+    [InlineData("+31 612345678", true)]
     [InlineData("0612345678", false)]
+    [InlineData("+31 6 12ab 5678", false)]
     public void E164(string phone, bool valid) => Assert.Equal(valid, Validators.IsValidE164(phone));
 }

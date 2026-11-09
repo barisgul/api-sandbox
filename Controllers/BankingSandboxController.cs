@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AuthSandbox.Controllers;
 
 /// <summary>
-/// Retail banking demo: onboarding (BSN + postal address) → KYC/CDD with document upload →
+/// Retail banking demo: onboarding (personal details + postal address) → KYC/CDD with document upload →
 /// account opening (IBAN) → Verification of Payee → SEPA (Instant) Credit Transfer →
 /// iDEAL-style payment requests → camt.053-style statements.
 /// </summary>
@@ -24,9 +24,9 @@ public class BankingSandboxController(BankingState state) : DemoControllerBase
 
     // ------------------------------------------------------------------ Customers
 
-    /// <summary>Step 1 — Onboard a customer (BSN, postal address).</summary>
+    /// <summary>Step 1 — Onboard a customer (personal details, postal address).</summary>
     /// <response code="201">Customer created with kycStatus NOT_STARTED.</response>
-    /// <response code="409">BSN already registered (code BSN_ALREADY_REGISTERED).</response>
+    /// <response code="409">Email address already registered (code EMAIL_ALREADY_REGISTERED).</response>
     /// <response code="422">Customer is under 18 (code MINIMUM_AGE_NOT_MET).</response>
     [HttpPost("customers")]
     [Consumes("application/json")]
@@ -37,8 +37,8 @@ public class BankingSandboxController(BankingState state) : DemoControllerBase
     {
         lock (state.Sync)
         {
-            if (state.Customers.Values.Any(c => c.Bsn == request.Bsn))
-                return ConflictProblem("BSN_ALREADY_REGISTERED", "A customer with this BSN already exists.");
+            if (state.Customers.Values.Any(c => c.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+                return ConflictProblem("EMAIL_ALREADY_REGISTERED", "A customer with this email address already exists.");
 
             var dob = request.DateOfBirth!.Value;
             if (dob.AddYears(18) > state.Today)
@@ -50,7 +50,6 @@ public class BankingSandboxController(BankingState state) : DemoControllerBase
                 FirstName = request.FirstName.Trim(),
                 LastName = request.LastName.Trim(),
                 DateOfBirth = dob,
-                Bsn = request.Bsn,
                 Email = request.Email,
                 Phone = request.Phone,
                 Nationality = request.Nationality,

@@ -39,17 +39,17 @@ public class BankingState : SandboxState
     protected override void Seed()
     {
         var now = Now;
-        Customer SeedCustomer(string id, string first, string last, string bsn, string dob, string street, int nr, string pc, string city) =>
+        Customer SeedCustomer(string id, string first, string last, string dob, string street, int nr, string pc, string city) =>
             Customers[id] = new Customer
             {
-                Id = id, FirstName = first, LastName = last, Bsn = bsn, DateOfBirth = DateOnly.Parse(dob),
+                Id = id, FirstName = first, LastName = last, DateOfBirth = DateOnly.Parse(dob),
                 Email = $"{first.ToLowerInvariant()}.{last.Replace(" ", "").ToLowerInvariant()}@example.nl",
                 Phone = "+31612345678", Nationality = "NL", KycStatus = KycStatus.APPROVED, CreatedAt = now.AddDays(-90),
                 Address = new PostalAddress { Street = street, HouseNumber = nr, Postcode = pc, City = city, Country = "NL" },
             };
 
-        var sanne = SeedCustomer("cus_seed_sanne", "Sanne", "Visser", "123456782", "1991-04-23", "Keizersgracht", 123, "1015 CJ", "Amsterdam");
-        var daan = SeedCustomer("cus_seed_daan", "Daan", "de Boer", "111222333", "1986-11-02", "Oudegracht", 45, "3511 AB", "Utrecht");
+        var sanne = SeedCustomer("cus_seed_sanne", "Sanne", "Visser", "1991-04-23", "Keizersgracht", 123, "1015 CJ", "Amsterdam");
+        var daan = SeedCustomer("cus_seed_daan", "Daan", "de Boer", "1986-11-02", "Oudegracht", 45, "3511 AB", "Utrecht");
 
         var sanneAcc = new Account
         {
@@ -97,6 +97,5 @@ public class BankingState : SandboxState
         accounts = Accounts.Values.Select(a => new { a.Id, a.Product, a.Iban, a.OwnerName, a.Balance }),
         accountProducts = Enum.GetNames<AccountProduct>(),
         externalPayees = ExternalPayees.Select(p => new { iban = p.Key, name = p.Value }),
-        syntheticBsnExamples = new[] { "234567892", "876543219", "999990019", "300000005" },
     };
 }

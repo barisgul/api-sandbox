@@ -7,9 +7,9 @@ public class BankingFlowTests
 {
     private const string B = "/api/sandbox/banking";
 
-    private static object NewCustomer(string bsn = "234567892", string lastName = "Visser", string dob = "1991-04-23", string nationality = "NL") => new
+    private static object NewCustomer(string email = "sanne@example.nl", string phone = "+31612345678", string lastName = "Visser", string dob = "1991-04-23", string nationality = "NL") => new
     {
-        firstName = "Sanne", lastName, dateOfBirth = dob, bsn, email = "sanne@example.nl", phone = "+31612345678", nationality,
+        firstName = "Sanne", lastName, dateOfBirth = dob, email, phone, nationality,
         address = new { street = "Keizersgracht", houseNumber = 123, houseNumberAddition = "A", postcode = "1015cj", city = "Amsterdam", country = "NL" },
     };
 
@@ -25,8 +25,8 @@ public class BankingFlowTests
         var customerId = (string)customer["id"]!;
         Assert.Equal("NOT_STARTED", (string?)customer["kycStatus"]);
         Assert.Equal("1015 CJ", (string?)customer["address"]!["postcode"]);
-        Assert.Equal("******892", (string?)customer["bsnMasked"]);
         Assert.Null(customer["bsn"]);
+        Assert.Null(customer["bsnMasked"]);
 
         var kyc = await api.Post($"{B}/customers/{customerId}/kyc", Kyc());
         Assert.Equal("APPROVED", (string?)kyc["status"]);
@@ -97,11 +97,13 @@ public class BankingFlowTests
     public async Task Negative_scenarios_return_realistic_errors()
     {
         using var api = new TestApi();
-        var bad = await api.Post($"{B}/customers", NewCustomer(bsn: "123456789"), HttpStatusCode.BadRequest);
-        Assert.NotNull(bad["errors"]!["Bsn"]);
+        var bad = await api.Post($"{B}/customers", NewCustomer(phone: "0612345678"), HttpStatusCode.BadRequest);
+        Assert.NotNull(bad["errors"]!["Phone"]);
+        var spaced = await api.Post($"{B}/customers", NewCustomer(email: "spaced@example.nl", phone: "+31 6 1234 5678"), HttpStatusCode.Created);
+        Assert.Equal("+31612345678", (string?)spaced["phone"]);
 
-        TestApi.AssertCode(await api.Post($"{B}/customers", NewCustomer(bsn: "123456782"), HttpStatusCode.Conflict), "BSN_ALREADY_REGISTERED");
-        TestApi.AssertCode(await api.Post($"{B}/customers", NewCustomer(dob: "2012-01-01"), HttpStatusCode.UnprocessableEntity), "MINIMUM_AGE_NOT_MET");
+        TestApi.AssertCode(await api.Post($"{B}/customers", NewCustomer(email: "Sanne.Visser@example.nl"), HttpStatusCode.Conflict), "EMAIL_ALREADY_REGISTERED");
+        TestApi.AssertCode(await api.Post($"{B}/customers", NewCustomer(email: "minor@example.nl", dob: "2012-01-01"), HttpStatusCode.UnprocessableEntity), "MINIMUM_AGE_NOT_MET");
         TestApi.AssertCode(await api.Get($"{B}/customers/cus_nope", HttpStatusCode.NotFound), "CUSTOMER_NOT_FOUND");
 
         var c = await api.Post($"{B}/customers", NewCustomer(), HttpStatusCode.Created);
@@ -113,7 +115,7 @@ public class BankingFlowTests
         await api.Post($"{B}/customers/{id}/kyc", Kyc(file: TestApi.SamplePng, contentType: "image/png"));
         TestApi.AssertCode(await api.Post($"{B}/customers/{id}/kyc", Kyc(), HttpStatusCode.Conflict), "KYC_ALREADY_APPROVED");
 
-        var sanction = await api.Post($"{B}/customers", NewCustomer(bsn: "876543219", lastName: "Sanction"), HttpStatusCode.Created);
+        var sanction = await api.Post($"{B}/customers", NewCustomer(email: "sanction@example.nl", lastName: "Sanction"), HttpStatusCode.Created);
         var rejected = await api.Post($"{B}/customers/{sanction["id"]}/kyc", Kyc());
         Assert.Equal("REJECTED", (string?)rejected["status"]);
         Assert.True((bool)rejected["screening"]!["sanctionsMatch"]!);

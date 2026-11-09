@@ -9,16 +9,6 @@ namespace AuthSandbox.Infrastructure.Demo;
 /// </summary>
 public static partial class Validators
 {
-    // ---------- BSN (Burgerservicenummer) — 11-proef ----------
-    public static bool IsValidBsn(string? value)
-    {
-        if (value is null || !BsnRegex().IsMatch(value)) return false;
-        var sum = 0;
-        for (var i = 0; i < 8; i++) sum += (value[i] - '0') * (9 - i);
-        sum -= value[8] - '0';
-        return sum % 11 == 0 && value != "000000000";
-    }
-
     // ---------- IBAN (ISO 13616, mod-97) ----------
     public static string NormalizeIban(string value) => value.Replace(" ", "").ToUpperInvariant();
 
@@ -81,7 +71,11 @@ public static partial class Validators
     }
 
     // ---------- E.164 phone ----------
-    public static bool IsValidE164(string? value) => value is not null && E164Regex().IsMatch(value);
+    /// <summary>E.164 check; spaces are ignored, so "+31 6 12345678" and "+31612345678" are both valid.</summary>
+    public static bool IsValidE164(string? value) => value is not null && E164Regex().IsMatch(NormalizePhone(value));
+
+    /// <summary>Removes spaces: "+31 6 1234 5678" → "+31612345678".</summary>
+    public static string NormalizePhone(string value) => value.Replace(" ", "").Trim();
 
     // ---------- GTIN / EAN-13 ----------
     public static bool IsValidEan13(string? value)
@@ -129,7 +123,6 @@ public static partial class Validators
 
     public static decimal Money(decimal value) => Math.Round(value, 2, MidpointRounding.AwayFromZero);
 
-    [GeneratedRegex(@"^\d{9}$")] private static partial Regex BsnRegex();
     [GeneratedRegex(@"^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$")] private static partial Regex IbanRegex();
     [GeneratedRegex(@"^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$")] private static partial Regex BicRegex();
     [GeneratedRegex(@"^[1-9]\d{3} ?(?!SA|SD|SS)[A-Z]{2}$")] private static partial Regex PostcodeRegex();

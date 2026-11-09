@@ -296,7 +296,9 @@ public class OpenApiTests
         Assert.Equal(System.Net.HttpStatusCode.NotFound, (await api.Client.GetAsync("/swagger/v1-demo/swagger.json")).StatusCode);
 
         var doc = await api.Get("/swagger/v1-banking/swagger.json");
-        Assert.Equal("234567892", (string?)doc["components"]!["schemas"]!["Banking.CreateCustomerRequest"]!["example"]!["bsn"]);
+        var customerSchema = doc["components"]!["schemas"]!["Banking.CreateCustomerRequest"]!;
+        Assert.Null(customerSchema["properties"]!["bsn"]);
+        Assert.Equal("+31612345678", (string?)customerSchema["example"]!["phone"]);
     }
 
     [Fact]

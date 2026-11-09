@@ -25,7 +25,7 @@ public enum PaymentRequestOutcome { SUCCESS, CANCELLED, FAILURE }
 [SchemaExample("""
 {
   "firstName": "Sanne", "lastName": "Visser", "dateOfBirth": "1991-04-23",
-  "bsn": "234567892", "email": "sanne.visser@example.nl", "phone": "+31612345678",
+  "email": "sanne.visser@example.nl", "phone": "+31612345678",
   "nationality": "NL",
   "address": { "street": "Keizersgracht", "houseNumber": 123, "houseNumberAddition": "A",
                "postcode": "1015 CJ", "city": "Amsterdam", "country": "NL" }
@@ -36,11 +36,10 @@ public class CreateCustomerRequest
     [Required, StringLength(50)] public string FirstName { get; set; } = "";
     [Required, StringLength(80)] public string LastName { get; set; } = "";
     [Required] public DateOnly? DateOfBirth { get; set; }
-    /// <summary>Synthetic Burgerservicenummer; must pass the 11-proef (e.g. 123456782, 111222333).</summary>
-    [Required, Bsn] public string Bsn { get; set; } = "";
     [Required, EmailAddress] public string Email { get; set; } = "";
     /// <summary>E.164, e.g. +31612345678.</summary>
-    [Required, E164] public string Phone { get; set; } = "";
+    [Required, E164] public string Phone { get => _phone; set => _phone = Validators.NormalizePhone(value ?? ""); }
+    private string _phone = "";
     /// <summary>ISO 3166-1 alpha-2.</summary>
     [Required, CountryCode] public string Nationality { get; set; } = "NL";
     [Required] public PostalAddress Address { get; set; } = new();
@@ -53,9 +52,6 @@ public class Customer
     public string LastName { get; set; } = "";
     public string FullName => $"{FirstName} {LastName}";
     public DateOnly DateOfBirth { get; set; }
-    /// <summary>BSN is never returned in full (GDPR data minimisation).</summary>
-    public string BsnMasked => Text.Mask(Bsn, 3);
-    [JsonIgnore] public string Bsn { get; set; } = "";
     public string Email { get; set; } = "";
     public string Phone { get; set; } = "";
     public string Nationality { get; set; } = "NL";
