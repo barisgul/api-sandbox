@@ -16,7 +16,7 @@ public static class SwaggerSetup
 {
     private const string Intro = "🧪 **Quixa Test API Sandbox** — ";
 
-    public record Doc(string Name, string Label, string Title, string Description, string? Scheme);
+    public record Doc(string Name, string Label, string Title, string Description, string? Scheme, SpecProfile Profile = SpecProfile.Standard);
 
     public static readonly Doc[] AuthDocs =
     [
@@ -27,7 +27,7 @@ public static class SwaggerSetup
         new("v1-apikey-cookie", "API Key (Cookie)", "Quixa Test API Sandbox — API Key (Cookie)", Intro + "Purpose-built mock target server developed to test `AuthCookie` cookie-based authentication (`sandbox-api-key-cookie-123`).", "ApiKeyCookie"),
         new("v1-oauth2", "OAuth 2.0", "Quixa Test API Sandbox — OAuth 2.0", Intro + "Purpose-built mock target server developed to test OAuth 2.0 Client Credentials flows, client_id / client_secret exchange, and scope verification.", "OAuth2"),
         new("v1-oidc", "OpenID Connect", "Quixa Test API Sandbox — OpenID Connect", Intro + "Purpose-built mock target server developed to test OpenID Connect discovery endpoints and identity token verification.", "OpenIDConnect"),
-        new("v1-healthcare", "Healthcare & Patient Care", "Quixa Test API Sandbox — Healthcare & Patient Care Pipeline", Intro + "Multi-step chainable REST API pipeline simulating patient intake, telehealth appointment holding, consultation notes, e-prescriptions, and pharmacy fulfillment.", null),
+        new("v1-healthcare", "Healthcare & Patient Care", "Quixa Test API Sandbox — Healthcare & Patient Care Pipeline", Intro + "Multi-step chainable REST API pipeline simulating patient intake, telehealth appointment holding, consultation notes, e-prescriptions, and pharmacy fulfillment.", null, SpecProfile.Uncurated),
         new("v1-health", "Health", "Quixa Test API Sandbox — Health", Intro + "Health check endpoint returning operational status, service metadata, and UTC timestamp.", null),
     ];
 
@@ -35,10 +35,10 @@ public static class SwaggerSetup
 
     public static readonly Doc[] DomainDocs =
     [
-        new("v1-banking", "Banking (SEPA / PSD2)", "Quixa Demo — Retail Banking (EU)", Intro + "Customer onboarding with personal details and postal address, KYC/CDD with multipart document upload, IBAN accounts, Verification of Payee, SEPA Credit Transfer & SEPA Instant, iDEAL-style payment requests, Berlin Group NextGenPSD2 account information and camt.053-style statements." + DemoNote, null),
+        new("v1-banking", "Banking (SEPA / PSD2)", "Quixa Demo — Retail Banking (EU)", Intro + "Customer onboarding with personal details and postal address, KYC/CDD with multipart document upload, IBAN accounts, Verification of Payee, SEPA Credit Transfer & SEPA Instant, iDEAL-style payment requests, Berlin Group NextGenPSD2 account information and camt.053-style statements." + DemoNote, null, SpecProfile.Hardened),
         new("v1-insurance", "Insurance", "Quixa Demo — Insurance (EU)", Intro + "Quote → policy (EUR premium incl. 21% insurance premium tax, SEPA direct debit mandate) → claim with multipart attachment → assessment and payout." + DemoNote, null),
         new("v1-travel", "Travel & Booking", "Quixa Demo — Travel & Booking (EU)", Intro + "Hotel and flight search → price-locked hold → booking with guest details → payment (SEPA / card token / iDEAL) → cancellation & refund, EU261 compensation check, per-country accommodation VAT and tourist tax." + DemoNote, null),
-        new("v1-ecommerce", "E-Commerce", "Quixa Demo — E-Commerce (EU)", Intro + "GTIN/EAN catalog → cart → checkout with EU VAT (OSS destination rates) → order → PostNL/DHL-style tracking → returns within the 14-day EU withdrawal period." + DemoNote, null),
+        new("v1-ecommerce", "E-Commerce", "Quixa Demo — E-Commerce (EU)", Intro + "GTIN/EAN catalog → cart → checkout with EU VAT (OSS destination rates) → order → PostNL/DHL-style tracking → returns within the 14-day EU withdrawal period." + DemoNote, null, SpecProfile.Hardened),
     ];
 
     public static IEnumerable<Doc> AllDocs => DomainDocs.Concat(AuthDocs);
@@ -74,8 +74,10 @@ public static class SwaggerSetup
 
             c.SchemaFilter<SchemaExampleFilter>();
             c.OperationFilter<DemoOperationFilter>();
+            c.OperationFilter<ApiContractOperationFilter>();
             c.DocumentFilter<SecurityPerDocumentFilter>();
             AddSecuritySchemes(c, creds);
+            c.DocumentFilter<ApiContractDocumentFilter>();
             c.DocumentFilter<ResourceTags.DocumentFilter>();   // last: replaces tags added by the XML-comments filter
         });
     }

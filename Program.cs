@@ -22,6 +22,7 @@ var sandboxCreds = builder.Configuration
     .Get<SandboxCredentials>() ?? new SandboxCredentials();
 
 // Add services to the container.
+builder.Services.Configure<OpenApiContractOptions>(builder.Configuration.GetSection(OpenApiContractOptions.Section));
 builder.Services.Configure<DemoAuthOptions>(builder.Configuration.GetSection(DemoAuthOptions.Section));
 builder.Services.AddControllers(o => o.Filters.Add<DemoAuthFilter>())
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -103,6 +104,7 @@ app.UseSandboxSwaggerUi();
 
 app.UseStaticFiles();
 app.UseHttpsRedirection();
+app.UseSandboxRateLimit();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

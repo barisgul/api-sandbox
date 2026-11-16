@@ -17,7 +17,9 @@ public class TravelSandboxController(TravelState state) : DemoControllerBase
     private const decimal AirportCharges = 18.00m;
 
     /// <summary>Reset travel data (offers, holds, bookings). Catalog data is static.</summary>
+    /// <response code="200">Seed restored; returns the fixture IDs to start a flow with.</response>
     [HttpPost("reset")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Reset()
     {
         state.Reset();

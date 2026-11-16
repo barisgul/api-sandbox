@@ -125,7 +125,7 @@ public class BankingPsd2Controller(BankingState state) : DemoControllerBase
     /// <summary>List accounts covered by the consent.</summary>
     /// <response code="401">CONSENT_INVALID or CONSENT_EXPIRED.</response>
     /// <response code="403">CONSENT_UNKNOWN.</response>
-    [HttpGet("accounts")]
+    [HttpGet("accounts", Name = "listPsd2Accounts")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(ProblemDetails), 401)]
     [ProducesResponseType(typeof(ProblemDetails), 403)]
@@ -139,7 +139,7 @@ public class BankingPsd2Controller(BankingState state) : DemoControllerBase
     }
 
     /// <summary>Read balances (closingBooked, interimAvailable).</summary>
-    [HttpGet("accounts/{accountId}/balances")]
+    [HttpGet("accounts/{accountId}/balances", Name = "getPsd2Balances")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(ProblemDetails), 401)]
     [ProducesResponseType(typeof(ProblemDetails), 403)]
@@ -165,7 +165,7 @@ public class BankingPsd2Controller(BankingState state) : DemoControllerBase
     }
 
     /// <summary>Read transactions. bookingStatus: booked (default), pending or both.</summary>
-    [HttpGet("accounts/{accountId}/transactions")]
+    [HttpGet("accounts/{accountId}/transactions", Name = "getPsd2Transactions")]
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(ProblemDetails), 401)]
     [ProducesResponseType(typeof(ProblemDetails), 403)]

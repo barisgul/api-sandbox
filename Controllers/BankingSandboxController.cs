@@ -15,7 +15,9 @@ namespace AuthSandbox.Controllers;
 public class BankingSandboxController(BankingState state) : DemoControllerBase
 {
     /// <summary>Reset all banking data to the deterministic seed (idempotent).</summary>
+    /// <response code="200">Seed restored; returns the fixture IDs to start a flow with.</response>
     [HttpPost("reset")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Reset()
     {
         state.Reset();

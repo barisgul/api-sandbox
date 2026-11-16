@@ -14,7 +14,9 @@ namespace AuthSandbox.Controllers;
 public class ECommerceSandboxController(ECommerceState state) : DemoControllerBase
 {
     /// <summary>Reset catalog, stock, carts and orders to the deterministic seed (idempotent).</summary>
+    /// <response code="200">Seed restored; returns the fixture IDs to start a flow with.</response>
     [HttpPost("reset")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Reset()
     {
         state.Reset();

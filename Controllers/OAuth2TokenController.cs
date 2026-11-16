@@ -29,8 +29,15 @@ public class OAuth2TokenController : ControllerBase
     /// <summary>
     /// OAuth2 token endpoint (application/x-www-form-urlencoded).
     /// </summary>
+    /// <remarks>Client credentials grant: send client_id / client_secret as HTTP Basic or in the form body.</remarks>
+    /// <response code="200">Access token (JWT, 1 hour) with the granted scopes.</response>
+    /// <response code="400">Unsupported grant_type (error unsupported_grant_type).</response>
+    /// <response code="401">Unknown client_id / client_secret (error invalid_client).</response>
     [HttpPost("token")]
     [Consumes("application/x-www-form-urlencoded")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult Token([FromForm] OAuth2TokenRequest request)
     {
         if (request.grant_type != "client_credentials")

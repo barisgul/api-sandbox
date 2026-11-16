@@ -13,7 +13,9 @@ public class InsuranceSandboxController(InsuranceState state) : DemoControllerBa
     private const decimal AutoApproveLimit = 5000m;
 
     /// <summary>Reset insurance data to the deterministic seed (idempotent).</summary>
+    /// <response code="200">Seed restored; returns the fixture IDs to start a flow with.</response>
     [HttpPost("reset")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult Reset()
     {
         state.Reset();
