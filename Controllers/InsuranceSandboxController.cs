@@ -135,7 +135,7 @@ public class InsuranceSandboxController(InsuranceState state) : DemoControllerBa
         }
     }
 
-    /// <summary>Get a policy.</summary>
+    /// <summary>Get a policy with its premium breakdown, SEPA mandate and cancellation status.</summary>
     [HttpGet("policies/{policyId}")]
     [ProducesResponseType(typeof(Policy), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]

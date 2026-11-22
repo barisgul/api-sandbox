@@ -43,6 +43,8 @@ public class CreateCustomerRequest
     /// <summary>ISO 3166-1 alpha-2.</summary>
     [Required, CountryCode] public string Nationality { get; set; } = "NL";
     [Required] public PostalAddress Address { get; set; } = new();
+    /// <summary>Optional BCP 47 language tag for correspondence, e.g. nl-NL.</summary>
+    [StringLength(10)] public string? PreferredLanguage { get; set; }
 }
 
 public class Customer

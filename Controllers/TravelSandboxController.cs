@@ -179,6 +179,7 @@ public class TravelSandboxController(TravelState state) : DemoControllerBase
     // ------------------------------------------------------------------ Booking
 
     /// <summary>Step 3 — Book a held offer with guest / passenger details.</summary>
+    /// <param name="requestId">Client-generated idempotency / correlation id (e.g. a UUID).</param>
     /// <response code="409">HOLD_ALREADY_BOOKED.</response>
     /// <response code="422">HOLD_EXPIRED, TRAVELLER_COUNT_MISMATCH, ADULT_REQUIRED.</response>
     [HttpPost("bookings")]
@@ -187,7 +188,8 @@ public class TravelSandboxController(TravelState state) : DemoControllerBase
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     [ProducesResponseType(typeof(ProblemDetails), 409)]
     [ProducesResponseType(typeof(ProblemDetails), 422)]
-    public IActionResult CreateBooking([FromBody] CreateBookingRequest request)
+    public IActionResult CreateBooking([FromBody] CreateBookingRequest request,
+        [FromHeader(Name = "X-Request-Id"), System.ComponentModel.DataAnnotations.Required, System.ComponentModel.DataAnnotations.StringLength(64)] string requestId)
     {
         lock (state.Sync)
         {

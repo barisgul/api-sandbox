@@ -32,6 +32,7 @@ public sealed class TestApi : IDisposable
             });
         });
         Client = _factory.CreateClient();
+        Client.DefaultRequestHeaders.Add("X-Request-Id", Guid.NewGuid().ToString());
     }
 
     public async Task<JsonNode> Send(HttpMethod method, string url, object? body, HttpStatusCode expected)

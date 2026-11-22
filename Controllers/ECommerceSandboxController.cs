@@ -260,7 +260,7 @@ public class ECommerceSandboxController(ECommerceState state) : DemoControllerBa
     }
 
     /// <summary>Track a shipment by shipment id or tracking number.</summary>
-    [HttpGet("shipments/{shipmentIdOrTracking}")]
+    [HttpGet("shipments/{shipmentIdOrTracking}/tracking")]
     [ProducesResponseType(typeof(Shipment), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 404)]
     public IActionResult GetShipment(string shipmentIdOrTracking) =>

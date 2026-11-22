@@ -172,7 +172,7 @@ public class ECommerceFlowTests
         var tracking = (string)shipment["trackingNumber"]!;
         Assert.StartsWith("3SQXDM", tracking);
         for (var i = 0; i < 3; i++) await api.Post($"{B}/shipments/{tracking}/advance", new { });
-        Assert.Equal("DELIVERED", (string?)(await api.Get($"{B}/shipments/{tracking}"))["status"]);
+        Assert.Equal("DELIVERED", (string?)(await api.Get($"{B}/shipments/{tracking}/tracking"))["status"]);
 
         var ret = await api.Post($"{B}/orders/{order["id"]}/returns", new { lines = new[] { new { lineId = 3, quantity = 1, reason = "Too small" } } }, HttpStatusCode.Created);
         Assert.Equal(85.00m, (decimal)ret["refundAmount"]!);
