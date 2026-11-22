@@ -26,7 +26,7 @@ public enum PaymentRequestOutcome { SUCCESS, CANCELLED, FAILURE }
 {
   "firstName": "Sanne", "lastName": "Visser", "dateOfBirth": "1991-04-23",
   "email": "sanne.visser@example.nl", "phone": "+31612345678",
-  "nationality": "NL",
+  "nationality": "NL", "preferredLanguage": "nl-NL",
   "address": { "street": "Keizersgracht", "houseNumber": 123, "houseNumberAddition": "A",
                "postcode": "1015 CJ", "city": "Amsterdam", "country": "NL" }
 }
